@@ -10,15 +10,16 @@ let staleAfter: TimeInterval = 12 * 3600  // ignore state files older than this
 let barColor = NSColor(red: 1.00, green: 0.23, blue: 0.19, alpha: 1) // red
 
 // solid = a session is busy (Claude working);
-// pulse = every live session is idle-waiting on you (turn done / needs input);
-// off   = nothing running.
+// pulse = a session needs a response from you now (permission prompt / blocked
+//         waiting for input — the Notification hook);
+// off   = a turn simply finished, or nothing running.
 enum Mode { case off, solid, pulse }
 
 func currentMode() -> Mode {
     let fm = FileManager.default
     guard let files = try? fm.contentsOfDirectory(atPath: stateDir) else { return .off }
     let now = Date().timeIntervalSince1970
-    var waiting = false
+    var needsInput = false
     for f in files where f.hasSuffix(".json") {
         let p = (stateDir as NSString).appendingPathComponent(f)
         guard let data = fm.contents(atPath: p),
@@ -26,10 +27,10 @@ func currentMode() -> Mode {
               let s = obj["state"] as? String else { continue }
         let ts = (obj["ts"] as? Double) ?? now
         if now - ts > staleAfter { continue }
-        if s == "busy" { return .solid }                       // busy wins immediately
-        if s == "waiting" || s == "needs_input" { waiting = true }
+        if s == "busy" { return .solid }              // busy wins immediately
+        if s == "needs_input" { needsInput = true }   // "waiting" (turn done) → no bar
     }
-    return waiting ? .pulse : .off
+    return needsInput ? .pulse : .off
 }
 
 final class Bar {

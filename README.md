@@ -4,18 +4,24 @@ A full-width **red bar** across the bottom edge of every screen that tells you, 
 across the room, what Claude Code is doing.
 
 - **Solid red bar** — at least one session is busy (Claude working).
-- **Pulsing red bar** — every session is idle and **waiting on you** (turn finished
-  or a permission prompt).
-- **No bar** — nothing running.
+- **Pulsing red bar** — a session **needs a response from you** now (a permission
+  prompt, or Claude blocked waiting for input).
+- **No bar** — a turn simply finished, or nothing running.
 
-Busy wins: if any session is still working the bar is solid; it only pulses once
-they're all waiting on you, and clears when nothing's running. The bar is
-click-through (it never intercepts your mouse) and floats above everything,
-including fullscreen apps, on every Space and every monitor.
+Busy wins: if any session is still working the bar is solid; it pulses only when one
+is actually waiting on your input. A turn that just *finishes* clears the bar — it
+blinks only when Claude needs you. The bar is click-through (it never intercepts your
+mouse) and floats above everything, including fullscreen apps, on every Space and
+every monitor.
+
+> Note: Claude Code has no hook for "ended a turn *with a question*," so a plain
+> end-of-turn question won't blink immediately — it registers as "done" (no bar). If
+> you don't reply, Claude Code's idle notification (~60s) fires and the bar starts
+> pulsing then. Permission prompts pulse instantly.
 
 <img src="images/ccbar-desk.jpg" width="320" alt="ccbar in action — the red bar along the bottom edge of the screen shows Claude is busy">
 
-*Solid red along the bottom edge = Claude is working; it pulses when Claude is waiting on you.*
+*Solid red along the bottom edge = Claude is working; it pulses when Claude needs a response from you.*
 
 ## Requirements
 
@@ -86,13 +92,13 @@ the repo folder.
    - `SessionEnd` → deletes the file
 2. `ccbar` (a tiny AppKit app, one borderless click-through window per screen at
    `.screenSaver` level, on all Spaces) polls the state directory every 0.4s: **solid**
-   if any live session is `busy`, else **pulsing** if any is `waiting`/`needs_input`,
-   else hidden.
+   if any live session is `busy`, else **pulsing** if any is `needs_input`, else
+   hidden (`waiting` — a finished turn — shows nothing).
 
 Multi-session just works: each session is its own file keyed by `session_id`, so
-three concurrent sessions share one bar — solid if *any* is working, pulsing once
-they're all waiting on you. Stale files (older than 12h, e.g. from a crash that
-skipped `SessionEnd`) are ignored.
+three concurrent sessions share one bar — solid if *any* is working, pulsing if *any*
+needs your input. Stale files (older than 12h, e.g. from a crash that skipped
+`SessionEnd`) are ignored.
 
 ## Configuration
 

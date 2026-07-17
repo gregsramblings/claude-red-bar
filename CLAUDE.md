@@ -2,8 +2,8 @@
 
 `ccbar` — a full-width red edge bar (bottom of every screen) that signals, from
 across the room, what Claude Code is doing. Solid red = a session is working; pulsing
-red = every session is idle-waiting on you (turn done / needs input); no bar = nothing
-running.
+red = a session needs a response from you now (permission prompt / blocked on input);
+no bar = a turn simply finished, or nothing running.
 
 ## Layout
 
@@ -44,11 +44,14 @@ The binary is not checked in — always rebuild after clone.
 `ccbar.swift`):
 
 - any live entry `busy` → **solid** red (busy wins immediately)
-- else any `waiting` / `needs_input` → **pulsing** red (waiting on you)
-- else → no bar
+- else any `needs_input` → **pulsing** red (Claude needs a response now)
+- else → no bar (`waiting`, i.e. a finished turn, shows nothing)
 
-Keep the three state strings (`busy`, `waiting`, `needs_input`) in sync across
-`hook.sh` and `currentMode()` — they are the whole API.
+`needs_input` comes from the `Notification` hook (permission prompt / idle-blocked).
+There is no hook for "ended a turn with a question," so a plain end-of-turn question
+is a `Stop` (`waiting` → no bar) until the idle Notification fires. Keep the three
+state strings (`busy`, `waiting`, `needs_input`) in sync across `hook.sh` and
+`currentMode()` — they are the whole API.
 
 ## Wiring (lives outside this repo)
 

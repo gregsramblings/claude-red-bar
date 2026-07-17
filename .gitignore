@@ -1,0 +1,4 @@
+# compiled binary — rebuild with swiftc
+ccbar
+*.o
+.DS_Store

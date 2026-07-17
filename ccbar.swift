@@ -2,7 +2,7 @@ import Cocoa
 
 // ---- config ----
 let stateDir = ("~/.claude/ccbar/state" as NSString).expandingTildeInPath
-let barHeight: CGFloat = 13.6        // px thickness of the edge bar (15% thinner than 16)
+let barHeight: CGFloat = 10          // px thickness of the edge bar
 let atTop = false                    // true = top edge, false = bottom edge
 let pollInterval = 0.4               // seconds
 let staleAfter: TimeInterval = 12 * 3600  // ignore state files older than this

@@ -52,9 +52,12 @@ The binary is not checked in — always rebuild after clone.
 The `Notification` hook is wired to `hook.sh notify`, which reads the notification
 `message` and splits it: the ~60s idle message ("waiting for your input") becomes
 `waiting` (no bar), everything else becomes `needs_input` (pulse). This keeps the
-idle timeout from blinking the bar — only a real prompt does. There is no hook for
-"ended a turn with a question," so a plain conversational end-of-turn question is a
-`Stop` (`waiting` → no bar) and will not pulse. Keep the state strings (`busy`,
+idle timeout from blinking the bar — only a real prompt does. A structured
+`AskUserQuestion` prompt pulses via `PreToolUse`/`PostToolUse` hooks matched to that
+tool (Pre → `needs_input`, Post → `busy`), since that tool does NOT fire
+`Notification`. There is still no hook for a plain conversational end-of-turn
+question, so that reads as `Stop` (`waiting` → no bar) and will not pulse. Keep the
+state strings (`busy`,
 `waiting`, `needs_input`) and the `notify` classifier in sync across `hook.sh` and
 `currentMode()` — they are the whole API. If Anthropic changes the idle message
 wording, update the `case` in `hook.sh`.
@@ -68,6 +71,8 @@ Claude Code hooks in `~/.claude/settings.json` drive `hook.sh`:
   "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "bash /path/to/ccbar/hook.sh busy" }] }],
   "Stop":            [{ "hooks": [{ "type": "command", "command": "bash /path/to/ccbar/hook.sh waiting" }] }],
   "Notification":    [{ "hooks": [{ "type": "command", "command": "bash /path/to/ccbar/hook.sh notify" }] }],
+  "PreToolUse":      [{ "matcher": "AskUserQuestion", "hooks": [{ "type": "command", "command": "bash /path/to/ccbar/hook.sh needs_input" }] }],
+  "PostToolUse":     [{ "matcher": "AskUserQuestion", "hooks": [{ "type": "command", "command": "bash /path/to/ccbar/hook.sh busy" }] }],
   "SessionEnd":      [{ "hooks": [{ "type": "command", "command": "bash /path/to/ccbar/hook.sh end" }] }]
 }
 ```

@@ -20,7 +20,8 @@ and every monitor.
 > the bar never blinks just because a finished session is sitting there. One
 > consequence: Claude Code has no distinct event for "ended a turn with a
 > question," so a plain conversational question at the end of a turn reads as done
-> (no bar) — only actual prompts pulse.
+> (no bar) — only actual prompts pulse. Structured `AskUserQuestion` prompts *do*
+> pulse, via a `PreToolUse`/`PostToolUse` hook on that tool.
 
 <img src="images/ccbar-desk.jpg" width="320" alt="ccbar in action — the red bar along the bottom edge of the screen shows Claude is busy">
 
@@ -93,6 +94,9 @@ the repo folder.
    - `Stop` → `waiting` (turn finished)
    - `Notification` → `notify`, which `hook.sh` splits into `needs_input` (a real
      prompt → pulse) or `waiting` (the idle timeout → no bar)
+   - `PreToolUse` (matching `AskUserQuestion`) → `needs_input` (pulse while a
+     multiple-choice question waits on you); `PostToolUse` → `busy` (solid again
+     once you answer)
    - `SessionEnd` → deletes the file
 2. `ccbar` (a tiny AppKit app, one borderless click-through window per screen at
    `.screenSaver` level, on all Spaces) polls the state directory every 0.4s: **solid**

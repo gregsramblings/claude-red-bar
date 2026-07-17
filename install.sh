@@ -74,6 +74,12 @@ cat <<EOF
     "Notification": [
       { "hooks": [{ "type": "command", "command": "bash $DIR/hook.sh notify" }] }
     ],
+    "PreToolUse": [
+      { "matcher": "AskUserQuestion", "hooks": [{ "type": "command", "command": "bash $DIR/hook.sh needs_input" }] }
+    ],
+    "PostToolUse": [
+      { "matcher": "AskUserQuestion", "hooks": [{ "type": "command", "command": "bash $DIR/hook.sh busy" }] }
+    ],
     "SessionEnd": [
       { "hooks": [{ "type": "command", "command": "bash $DIR/hook.sh end" }] }
     ]

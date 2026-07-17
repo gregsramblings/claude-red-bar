@@ -1,18 +1,21 @@
 # ccbar
 
 A full-width **red bar** across the bottom edge of every screen that tells you, from
-across the room, that **Claude Code is busy working**.
+across the room, what Claude Code is doing.
 
-- **Red bar** — at least one Claude Code session is busy (Claude working).
-- **No bar** — everything idle: waiting on you, needing input, or nothing running.
+- **Solid red bar** — at least one session is busy (Claude working).
+- **Pulsing red bar** — every session is idle and **waiting on you** (turn finished
+  or a permission prompt).
+- **No bar** — nothing running.
 
-Any busy session shows the bar; it clears the moment the last one finishes. The bar
-is click-through (it never intercepts your mouse) and floats above everything,
+Busy wins: if any session is still working the bar is solid; it only pulses once
+they're all waiting on you, and clears when nothing's running. The bar is
+click-through (it never intercepts your mouse) and floats above everything,
 including fullscreen apps, on every Space and every monitor.
 
 <img src="images/ccbar-desk.jpg" width="320" alt="ccbar in action — the red bar along the bottom edge of the screen shows Claude is busy">
 
-*The red bar along the bottom edge of the screen = Claude is working.*
+*Solid red along the bottom edge = Claude is working; it pulses when Claude is waiting on you.*
 
 ## Requirements
 
@@ -82,16 +85,14 @@ the repo folder.
    - `Notification` → `needs_input` (permission prompt / idle)
    - `SessionEnd` → deletes the file
 2. `ccbar` (a tiny AppKit app, one borderless click-through window per screen at
-   `.screenSaver` level, on all Spaces) polls the state directory every 0.4s and
-   shows the red bar **iff** any live session's state is `busy`.
+   `.screenSaver` level, on all Spaces) polls the state directory every 0.4s: **solid**
+   if any live session is `busy`, else **pulsing** if any is `waiting`/`needs_input`,
+   else hidden.
 
 Multi-session just works: each session is its own file keyed by `session_id`, so
-three concurrent sessions share one bar — busy if *any* of them is working. Stale
-files (older than 12h, e.g. from a crash that skipped `SessionEnd`) are ignored.
-
-`hook.sh` records `waiting` / `needs_input` too (they carry `cwd` + a timestamp), but
-only `busy` currently drives the bar — the other states are there if you want to
-extend it.
+three concurrent sessions share one bar — solid if *any* is working, pulsing once
+they're all waiting on you. Stale files (older than 12h, e.g. from a crash that
+skipped `SessionEnd`) are ignored.
 
 ## Configuration
 

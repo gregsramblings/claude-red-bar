@@ -1,8 +1,9 @@
 # CLAUDE.md
 
 `ccbar` — a full-width red edge bar (bottom of every screen) that signals, from
-across the room, that Claude Code is busy. Red = at least one session working; no
-bar = everything idle (waiting on you, needing input, or nothing running).
+across the room, what Claude Code is doing. Solid red = a session is working; pulsing
+red = every session is idle-waiting on you (turn done / needs input); no bar = nothing
+running.
 
 ## Layout
 
@@ -39,12 +40,15 @@ The binary is not checked in — always rebuild after clone.
 ```
 
 `SessionEnd` calls `hook.sh end`, which deletes the file. The app reads every
-`*.json`, ignores entries older than 12h, and shows the red bar iff any live entry
-has `state == "busy"`. `waiting` / `needs_input` / no file → no bar.
+`*.json`, ignores entries older than 12h, and picks a mode (`currentMode()` in
+`ccbar.swift`):
 
-`hook.sh` still writes all three states (waiting/needs_input carry `cwd` + `ts` for
-possible future use), but only `busy` drives the bar — see `anyBusy()` in
-`ccbar.swift`. Keep the `busy` string in sync across both files; it is the whole API.
+- any live entry `busy` → **solid** red (busy wins immediately)
+- else any `waiting` / `needs_input` → **pulsing** red (waiting on you)
+- else → no bar
+
+Keep the three state strings (`busy`, `waiting`, `needs_input`) in sync across
+`hook.sh` and `currentMode()` — they are the whole API.
 
 ## Wiring (lives outside this repo)
 

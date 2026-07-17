@@ -9,11 +9,16 @@ let staleAfter: TimeInterval = 12 * 3600  // ignore state files older than this
 
 let barColor = NSColor(red: 1.00, green: 0.23, blue: 0.19, alpha: 1) // red
 
-// bar shows only while at least one session is busy (Claude working)
-func anyBusy() -> Bool {
+// solid = a session is busy (Claude working);
+// pulse = every live session is idle-waiting on you (turn done / needs input);
+// off   = nothing running.
+enum Mode { case off, solid, pulse }
+
+func currentMode() -> Mode {
     let fm = FileManager.default
-    guard let files = try? fm.contentsOfDirectory(atPath: stateDir) else { return false }
+    guard let files = try? fm.contentsOfDirectory(atPath: stateDir) else { return .off }
     let now = Date().timeIntervalSince1970
+    var waiting = false
     for f in files where f.hasSuffix(".json") {
         let p = (stateDir as NSString).appendingPathComponent(f)
         guard let data = fm.contents(atPath: p),
@@ -21,9 +26,10 @@ func anyBusy() -> Bool {
               let s = obj["state"] as? String else { continue }
         let ts = (obj["ts"] as? Double) ?? now
         if now - ts > staleAfter { continue }
-        if s == "busy" { return true }
+        if s == "busy" { return .solid }                       // busy wins immediately
+        if s == "waiting" || s == "needs_input" { waiting = true }
     }
-    return false
+    return waiting ? .pulse : .off
 }
 
 final class Bar {
@@ -49,8 +55,28 @@ final class Bar {
         win.contentView = view
         win.orderFrontRegardless()
     }
-    func apply(_ busy: Bool) {
-        view.layer!.backgroundColor = (busy ? barColor : .clear).cgColor
+    func apply(_ mode: Mode) {
+        let layer = view.layer!
+        switch mode {
+        case .off:
+            layer.removeAnimation(forKey: "pulse")
+            layer.backgroundColor = NSColor.clear.cgColor
+        case .solid:
+            layer.removeAnimation(forKey: "pulse")
+            layer.opacity = 1
+            layer.backgroundColor = barColor.cgColor
+        case .pulse:
+            layer.backgroundColor = barColor.cgColor
+            if layer.animation(forKey: "pulse") == nil {
+                let a = CABasicAnimation(keyPath: "opacity")
+                a.fromValue = 1.0
+                a.toValue = 0.25
+                a.duration = 0.7
+                a.autoreverses = true
+                a.repeatCount = .infinity
+                layer.add(a, forKey: "pulse")
+            }
+        }
     }
     func close() { win.orderOut(nil) }
 }
@@ -78,8 +104,8 @@ final class App: NSObject, NSApplicationDelegate {
     }
 
     func tick() {
-        let busy = anyBusy()
-        bars.forEach { $0.apply(busy) }
+        let mode = currentMode()
+        bars.forEach { $0.apply(mode) }
     }
 }
 

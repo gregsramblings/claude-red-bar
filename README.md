@@ -26,8 +26,9 @@ and every monitor.
 > pulse, via a `PreToolUse`/`PostToolUse` hook on that tool.
 
 <img src="images/statusbar.jpg" width="320" alt="ccbar in action — the red bar along the bottom edge of the screen shows Claude is busy">
+<img src="images/statusbar-menu.jpg" width="260" alt="ccbar menu-bar menu — Position, Thickness, Bar Color, About, and Quit">
 
-*Solid red along the bottom edge = Claude is working; it pulses when Claude needs a response from you.*
+*Left: solid red along the bottom edge = Claude is working; it pulses when Claude needs a response from you. Right: the menu-bar menu for live configuration.*
 
 ## Requirements
 

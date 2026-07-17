@@ -115,7 +115,7 @@ Constants at the top of `ccbar.swift` (rebuild + restart the agent after changin
 
 | Constant       | Default | Meaning                                            |
 |----------------|---------|----------------------------------------------------|
-| `barHeight`    | `13.6`  | Bar thickness in px. Bump to 24+ for a big room.   |
+| `barHeight`    | `10`    | Bar thickness in px. Bump to 24+ for a big room.   |
 | `atTop`        | `false` | `true` pins the bar to the top edge instead.       |
 | `barColor`     | red     | The bar color.                                     |
 | `pollInterval` | `0.4`   | Seconds between state-dir polls.                   |

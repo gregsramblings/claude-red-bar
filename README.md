@@ -9,15 +9,18 @@ across the room, what Claude Code is doing.
 - **No bar** — a turn simply finished, or nothing running.
 
 Busy wins: if any session is still working the bar is solid; it pulses only when one
-is actually waiting on your input. A turn that just *finishes* clears the bar — it
-blinks only when Claude needs you. The bar is click-through (it never intercepts your
-mouse) and floats above everything, including fullscreen apps, on every Space and
-every monitor.
+has an active prompt for you (a permission request or an explicit question). A turn
+that just *finishes* clears the bar. The bar is click-through (it never intercepts
+your mouse) and floats above everything, including fullscreen apps, on every Space
+and every monitor.
 
-> Note: Claude Code has no hook for "ended a turn *with a question*," so a plain
-> end-of-turn question won't blink immediately — it registers as "done" (no bar). If
-> you don't reply, Claude Code's idle notification (~60s) fires and the bar starts
-> pulsing then. Permission prompts pulse instantly.
+> Note: pulsing is driven by Claude Code's `Notification` hook, which fires for a
+> real prompt (a permission request, etc.). The ~60s **idle** notification is
+> deliberately ignored (`hook.sh` filters the "waiting for your input" message), so
+> the bar never blinks just because a finished session is sitting there. One
+> consequence: Claude Code has no distinct event for "ended a turn with a
+> question," so a plain conversational question at the end of a turn reads as done
+> (no bar) — only actual prompts pulse.
 
 <img src="images/ccbar-desk.jpg" width="320" alt="ccbar in action — the red bar along the bottom edge of the screen shows Claude is busy">
 
@@ -88,7 +91,8 @@ the repo folder.
    small JSON file per session into `~/.claude/ccbar/state/<session_id>.json`:
    - `UserPromptSubmit` → `busy` (you handed off; Claude is working)
    - `Stop` → `waiting` (turn finished)
-   - `Notification` → `needs_input` (permission prompt / idle)
+   - `Notification` → `notify`, which `hook.sh` splits into `needs_input` (a real
+     prompt → pulse) or `waiting` (the idle timeout → no bar)
    - `SessionEnd` → deletes the file
 2. `ccbar` (a tiny AppKit app, one borderless click-through window per screen at
    `.screenSaver` level, on all Spaces) polls the state directory every 0.4s: **solid**

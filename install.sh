@@ -72,7 +72,7 @@ cat <<EOF
       { "hooks": [{ "type": "command", "command": "bash $DIR/hook.sh waiting" }] }
     ],
     "Notification": [
-      { "hooks": [{ "type": "command", "command": "bash $DIR/hook.sh needs_input" }] }
+      { "hooks": [{ "type": "command", "command": "bash $DIR/hook.sh notify" }] }
     ],
     "SessionEnd": [
       { "hooks": [{ "type": "command", "command": "bash $DIR/hook.sh end" }] }

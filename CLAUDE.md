@@ -33,7 +33,9 @@ The binary is not checked in — always rebuild after clone.
 
 ## State protocol (the contract between the two halves)
 
-`hook.sh <state>` writes `~/.claude/ccbar/state/<session_id>.json`:
+`hook.sh <arg>` (arg ∈ `busy` | `waiting` | `notify` | `end`) writes
+`~/.claude/ccbar/state/<session_id>.json`. `notify` resolves to `needs_input` or
+`waiting` per the message (see below); `end` deletes the file:
 
 ```json
 { "state": "busy|waiting|needs_input", "cwd": "...", "ts": 1700000000 }
@@ -47,11 +49,15 @@ The binary is not checked in — always rebuild after clone.
 - else any `needs_input` → **pulsing** red (Claude needs a response now)
 - else → no bar (`waiting`, i.e. a finished turn, shows nothing)
 
-`needs_input` comes from the `Notification` hook (permission prompt / idle-blocked).
-There is no hook for "ended a turn with a question," so a plain end-of-turn question
-is a `Stop` (`waiting` → no bar) until the idle Notification fires. Keep the three
-state strings (`busy`, `waiting`, `needs_input`) in sync across `hook.sh` and
-`currentMode()` — they are the whole API.
+The `Notification` hook is wired to `hook.sh notify`, which reads the notification
+`message` and splits it: the ~60s idle message ("waiting for your input") becomes
+`waiting` (no bar), everything else becomes `needs_input` (pulse). This keeps the
+idle timeout from blinking the bar — only a real prompt does. There is no hook for
+"ended a turn with a question," so a plain conversational end-of-turn question is a
+`Stop` (`waiting` → no bar) and will not pulse. Keep the state strings (`busy`,
+`waiting`, `needs_input`) and the `notify` classifier in sync across `hook.sh` and
+`currentMode()` — they are the whole API. If Anthropic changes the idle message
+wording, update the `case` in `hook.sh`.
 
 ## Wiring (lives outside this repo)
 
@@ -61,7 +67,7 @@ Claude Code hooks in `~/.claude/settings.json` drive `hook.sh`:
 "hooks": {
   "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "bash /path/to/ccbar/hook.sh busy" }] }],
   "Stop":            [{ "hooks": [{ "type": "command", "command": "bash /path/to/ccbar/hook.sh waiting" }] }],
-  "Notification":    [{ "hooks": [{ "type": "command", "command": "bash /path/to/ccbar/hook.sh needs_input" }] }],
+  "Notification":    [{ "hooks": [{ "type": "command", "command": "bash /path/to/ccbar/hook.sh notify" }] }],
   "SessionEnd":      [{ "hooks": [{ "type": "command", "command": "bash /path/to/ccbar/hook.sh end" }] }]
 }
 ```

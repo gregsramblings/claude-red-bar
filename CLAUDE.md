@@ -11,13 +11,19 @@ bar = everything idle (waiting on you, needing input, or nothing running).
   `NSScreen`. Polls the state dir every 0.4s and paints the top-priority color.
 - `hook.sh` — Claude Code hook target. Reads the hook JSON on stdin, extracts
   `session_id` (+ `cwd`) with `plutil`, writes/deletes one state file per session.
-- `com.ccbar.plist` — LaunchAgent (copy of the installed one) for run-at-login.
-- `ccbar` — compiled binary (gitignored).
+- `install.sh` — builds, generates the LaunchAgent (path derived from the repo
+  location), loads it, and prints the hooks block to add to `settings.json`.
+- `uninstall.sh` — unloads/removes the LaunchAgent and state dir.
+- `ccbar` — compiled binary (gitignored; built by `install.sh`).
 
 ## Build & run
 
+`./install.sh` does everything (build + LaunchAgent + print hooks). It is
+idempotent — re-run it after any change to `ccbar.swift` to rebuild and restart the
+agent. Manual equivalent:
+
 ```bash
-swiftc ccbar.swift -o ccbar -framework Cocoa      # build
+swiftc ccbar.swift -o ccbar -framework Cocoa              # build
 launchctl unload ~/Library/LaunchAgents/com.ccbar.plist   # restart after a rebuild
 launchctl load   ~/Library/LaunchAgents/com.ccbar.plist
 ```

@@ -10,7 +10,7 @@ Any busy session shows the bar; it clears the moment the last one finishes. The 
 is click-through (it never intercepts your mouse) and floats above everything,
 including fullscreen apps, on every Space and every monitor.
 
-![ccbar in action — the red bar along the bottom edge of the screen shows Claude is busy](images/ccbar-desk.jpg)
+<img src="images/ccbar-desk.jpg" width="320" alt="ccbar in action — the red bar along the bottom edge of the screen shows Claude is busy">
 
 *The red bar along the bottom edge of the screen = Claude is working.*
 

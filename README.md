@@ -10,7 +10,9 @@ Any busy session shows the bar; it clears the moment the last one finishes. The 
 is click-through (it never intercepts your mouse) and floats above everything,
 including fullscreen apps, on every Space and every monitor.
 
-![states](https://img.shields.io/badge/busy-red%20bar-red) ![states](https://img.shields.io/badge/idle-no%20bar-lightgrey)
+![ccbar in action — the red bar along the bottom of the laptop shows Claude is busy](images/ccbar-desk.jpg)
+
+*The red bar along the bottom edge of the laptop on the left = Claude is working.*
 
 ## Requirements
 

@@ -110,14 +110,23 @@ needs your input. Stale files (older than 12h, e.g. from a crash that skipped
 
 ## Configuration
 
-Constants at the top of `ccbar.swift` (rebuild + restart the agent after changing —
+ccbar adds a small bar-shaped icon to the **macOS menu bar**. Click it to configure
+the bar live — no rebuild, no restart:
+
+| Menu item     | Default  | Meaning                                              |
+|---------------|----------|------------------------------------------------------|
+| **Position**  | Bottom   | Pin the bar to the Top or Bottom edge.               |
+| **Thickness** | `10` px  | Bar thickness (presets `4`–`30`). Bump for a big room. |
+| **Bar Color…** | red      | Opens the macOS color picker; recolors the bar live. |
+| **About ccbar** | —      | Description, author, link to this repo.              |
+| **Quit ccbar** | —       | Stops the app (unloads the LaunchAgent so it stays down). |
+
+Choices persist in `UserDefaults` across restarts. The remaining tunables are still
+compile-time constants at the top of `ccbar.swift` (rebuild + restart after changing —
 `./install.sh` again does both):
 
 | Constant       | Default | Meaning                                            |
 |----------------|---------|----------------------------------------------------|
-| `barHeight`    | `10`    | Bar thickness in px. Bump to 24+ for a big room.   |
-| `atTop`        | `false` | `true` pins the bar to the top edge instead.       |
-| `barColor`     | red     | The bar color.                                     |
 | `pollInterval` | `0.4`   | Seconds between state-dir polls.                   |
 | `staleAfter`   | `43200` | Ignore state files older than this (seconds).      |
 
@@ -143,7 +152,7 @@ Constants at the top of `ccbar.swift` (rebuild + restart the agent after changin
 - `Stop` is the main-agent stop only (`SubagentStop` is a separate, unhooked event),
   so the bar tracks real turn boundaries, not sub-agent churn.
 - The bar sits at the very bottom edge. If your Dock is at the bottom and hides it,
-  set `atTop = true` or increase `barHeight`.
+  switch **Position → Top** or bump **Thickness** in the menu-bar menu.
 
 ## License
 

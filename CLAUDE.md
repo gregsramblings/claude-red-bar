@@ -84,8 +84,16 @@ boundaries.
 
 ## Conventions
 
-- Config constants live at the top of `ccbar.swift`: `barHeight`, `atTop` (false =
-  bottom edge — current default), `pollInterval`, `staleAfter`, `barColor`.
+- Runtime config lives in `UserDefaults`, driven by a menu-bar item (`NSStatusItem`,
+  a small bar icon): **Position** (Top/Bottom, default Bottom), **Thickness** (px
+  presets, default 10), and **Bar Color…** (an `NSColorPanel`; the chosen `NSColor`
+  is archived into `UserDefaults`). `cfgAtTop()`/`cfgBarHeight()`/`cfgBarColor()` read
+  them; menu actions write the key and call `rebuild()` to re-lay every bar live (the
+  color panel applies on every drag via `colorChanged`). Fallback defaults and the
+  preset list (`defaultAtTop`, `defaultBarHeight`, `defaultBarColor`,
+  `thicknessPresets`) sit at the top of `ccbar.swift`, alongside the still-compile-time
+  `pollInterval`, `staleAfter`. Menu **Quit** unloads the LaunchAgent first
+  (KeepAlive=true would else relaunch it).
 - No dependencies, no build step beyond `swiftc`. Keep it one file.
 - `hook.sh` must stay fast and never block a turn: parse, write, exit. No network.
 - Parse hook JSON with `plutil` (always present on macOS) — do not assume `jq`.

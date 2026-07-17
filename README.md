@@ -23,7 +23,7 @@ and every monitor.
 > (no bar) — only actual prompts pulse. Structured `AskUserQuestion` prompts *do*
 > pulse, via a `PreToolUse`/`PostToolUse` hook on that tool.
 
-<img src="images/ccbar-desk.jpg" width="320" alt="ccbar in action — the red bar along the bottom edge of the screen shows Claude is busy">
+<img src="images/statusbar.jpg" width="320" alt="ccbar in action — the red bar along the bottom edge of the screen shows Claude is busy">
 
 *Solid red along the bottom edge = Claude is working; it pulses when Claude needs a response from you.*
 

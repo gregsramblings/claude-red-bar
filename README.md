@@ -129,6 +129,13 @@ Constants at the top of `ccbar.swift` (rebuild + restart the agent after changin
 
 ## Notes
 
+- **Fragility — the idle filter is a string match.** `hook.sh` distinguishes the
+  ~60s idle notification from a real prompt by matching the substring
+  `waiting for your input` in the notification `message`. This is Claude Code's
+  current idle wording, not a stable API. If Anthropic changes that text, the idle
+  timeout will start pulsing the bar again. The fix is one line — update the `case`
+  pattern in `hook.sh`. (Conversely, only known idle text is suppressed, so any new
+  message defaults to *pulse*, never to silently hiding a real prompt.)
 - `Stop` is the main-agent stop only (`SubagentStop` is a separate, unhooked event),
   so the bar tracks real turn boundaries, not sub-agent churn.
 - The bar sits at the very bottom edge. If your Dock is at the bottom and hides it,

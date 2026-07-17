@@ -1,8 +1,8 @@
 # CLAUDE.md
 
-`ccbar` — a full-width edge bar (top or bottom of every screen) that signals, from
-across the room, the state of your Claude Code sessions. Green = a session waits on
-you; red pulsing = a session needs input; no bar = all busy.
+`ccbar` — a full-width red edge bar (bottom of every screen) that signals, from
+across the room, that Claude Code is busy. Red = at least one session working; no
+bar = everything idle (waiting on you, needing input, or nothing running).
 
 ## Layout
 
@@ -33,15 +33,12 @@ The binary is not checked in — always rebuild after clone.
 ```
 
 `SessionEnd` calls `hook.sh end`, which deletes the file. The app reads every
-`*.json`, ignores entries older than 12h, and maps `state`:
+`*.json`, ignores entries older than 12h, and shows the red bar iff any live entry
+has `state == "busy"`. `waiting` / `needs_input` / no file → no bar.
 
-- `busy` → no bar
-- `waiting` → green
-- `needs_input` → red, pulsing
-
-Priority across all sessions: `needs_input` > `waiting` > none. Keep these three
-state strings in sync across `hook.sh` and `topState()` in `ccbar.swift` — they are
-the whole API.
+`hook.sh` still writes all three states (waiting/needs_input carry `cwd` + `ts` for
+possible future use), but only `busy` drives the bar — see `anyBusy()` in
+`ccbar.swift`. Keep the `busy` string in sync across both files; it is the whole API.
 
 ## Wiring (lives outside this repo)
 
@@ -64,7 +61,7 @@ boundaries.
 ## Conventions
 
 - Config constants live at the top of `ccbar.swift`: `barHeight`, `atTop` (false =
-  bottom edge — current default), `pollInterval`, `staleAfter`, `colorFor`.
+  bottom edge — current default), `pollInterval`, `staleAfter`, `barColor`.
 - No dependencies, no build step beyond `swiftc`. Keep it one file.
 - `hook.sh` must stay fast and never block a turn: parse, write, exit. No network.
 - Parse hook JSON with `plutil` (always present on macOS) — do not assume `jq`.

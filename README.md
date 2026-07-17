@@ -1,14 +1,12 @@
 # ccbar
 
-A full-width colored bar across the top edge of every screen that tells you, from
-across the room, what Claude Code sessions are doing.
+A full-width red bar across the bottom edge of every screen that tells you, from
+across the room, that Claude Code is busy working.
 
-- **No bar** — everything busy (Claude working). Nothing needs you.
-- **Green bar** — a session finished its turn and is waiting on *you*.
-- **Red bar (pulsing)** — a session needs input (permission prompt / idle).
+- **Red bar** — at least one session is busy (Claude working).
+- **No bar** — everything idle: waiting on you, needing input, or nothing running.
 
-Priority across all sessions wins the bar: red > green > none. So one red among
-three greens shows red until you clear it.
+Any busy session shows the bar; it clears the moment the last one finishes.
 
 ## How it works
 
@@ -20,8 +18,8 @@ three greens shows red until you clear it.
    - `Notification` → `needs_input`
    - `SessionEnd` → removes the file
 2. `ccbar` (AppKit, borderless click-through window at `.screenSaver` level on
-   every `NSScreen`, all Spaces) polls the state dir every 0.4s and paints the
-   top-priority color.
+   every `NSScreen`, all Spaces) polls the state dir every 0.4s and shows a red
+   bar if any session is `busy`, otherwise nothing.
 
 Multi-session just works: each session is its own file, keyed by `session_id`.
 Stale files (>12h) are ignored.
@@ -47,9 +45,8 @@ After editing `ccbar.swift`: rebuild, then `unload` + `load` to restart.
 ## Tweaks (top of `ccbar.swift`)
 
 - `barHeight` — thickness (px). Bump to 24+ for a bigger room.
-- `atTop` — `false` to pin the bar to the bottom edge instead.
-- `colorFor` — the two colors.
-- pulse — the red `CABasicAnimation` in `Bar.apply`; delete the block for steady red.
+- `atTop` — `true` to pin the bar to the top edge instead (default: bottom).
+- `barColor` — the bar color.
 
 ## Notes
 

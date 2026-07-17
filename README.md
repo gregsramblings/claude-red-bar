@@ -144,3 +144,8 @@ Constants at the top of `ccbar.swift` (rebuild + restart the agent after changin
   so the bar tracks real turn boundaries, not sub-agent churn.
 - The bar sits at the very bottom edge. If your Dock is at the bottom and hides it,
   set `atTop = true` or increase `barHeight`.
+
+## License
+
+Public domain — [The Unlicense](LICENSE). Do whatever you want with it, no
+attribution required, no warranty, no liability.

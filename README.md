@@ -1,5 +1,7 @@
 # ccbar
 
+**Version 1.0**
+
 A full-width **red bar** across the bottom edge of every screen that tells you, from
 across the room, what Claude Code is doing.
 

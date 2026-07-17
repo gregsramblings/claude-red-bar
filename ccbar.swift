@@ -1,6 +1,7 @@
 import Cocoa
 
 // ---- config ----
+let ccbarVersion = "1.0"
 let stateDir = ("~/.claude/ccbar/state" as NSString).expandingTildeInPath
 let pollInterval = 0.4               // seconds
 let staleAfter: TimeInterval = 12 * 3600  // ignore state files older than this
@@ -210,7 +211,7 @@ final class App: NSObject, NSApplicationDelegate {
     @objc func about() {
         let a = NSAlert()
         a.icon = barIcon()
-        a.messageText = "ccbar"
+        a.messageText = "ccbar \(ccbarVersion)"
         a.informativeText = """
             A full-width red edge bar that signals, from across the room, what \
             Claude Code is doing: solid = working, pulsing = needs your input.

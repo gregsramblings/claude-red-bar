@@ -182,6 +182,10 @@ final class App: NSObject, NSApplicationDelegate {
         about.target = self
         m.addItem(about)
 
+        let uninstall = NSMenuItem(title: "Uninstall ccbar…", action: #selector(uninstall), keyEquivalent: "")
+        uninstall.target = self
+        m.addItem(uninstall)
+
         let quit = NSMenuItem(title: "Quit ccbar", action: #selector(quit), keyEquivalent: "q")
         quit.target = self
         m.addItem(quit)
@@ -237,6 +241,38 @@ final class App: NSObject, NSApplicationDelegate {
         if let t = sender.representedObject as? Double { ud.set(t, forKey: "barHeight") }
         rebuildMenu()
         rebuild()
+    }
+
+    @objc func uninstall() {
+        let a = NSAlert()
+        a.icon = barIcon()
+        a.alertStyle = .warning
+        a.messageText = "Uninstall ccbar?"
+        a.informativeText = """
+            This stops and removes the LaunchAgent and deletes the state \
+            directory (~/.claude/ccbar), then quits.
+
+            You must still remove the ccbar "hooks" block from \
+            ~/.claude/settings.json yourself, and delete the repo folder to \
+            remove the binary.
+            """
+        a.addButton(withTitle: "Uninstall")
+        a.addButton(withTitle: "Cancel")
+        NSApp.activate(ignoringOtherApps: true)
+        guard a.runModal() == .alertFirstButtonReturn else { return }
+
+        // Unload before deleting the plist so launchd doesn't relaunch us.
+        let plist = ("~/Library/LaunchAgents/com.ccbar.plist" as NSString).expandingTildeInPath
+        let p = Process()
+        p.launchPath = "/bin/launchctl"
+        p.arguments = ["unload", plist]
+        try? p.run()
+        p.waitUntilExit()
+
+        let fm = FileManager.default
+        try? fm.removeItem(atPath: plist)
+        try? fm.removeItem(atPath: ("~/.claude/ccbar" as NSString).expandingTildeInPath)
+        NSApp.terminate(nil)
     }
 
     @objc func quit() {

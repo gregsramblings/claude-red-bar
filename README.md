@@ -1,6 +1,6 @@
-# ccbar
+# ccbar - MacOS
 
-**Version 1.0**
+**Version 1.0** · **macOS only** (uses AppKit + `launchd`; there is no Windows or Linux build).
 
 A full-width **red bar** along one edge of every screen that tells you, from
 across the room, what Claude Code is doing. It sits on the **top** edge by default

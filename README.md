@@ -2,8 +2,9 @@
 
 **Version 1.0**
 
-A full-width **red bar** across the bottom edge of every screen that tells you, from
-across the room, what Claude Code is doing.
+A full-width **red bar** along one edge of every screen that tells you, from
+across the room, what Claude Code is doing. It sits on the **top** edge by default
+(position, thickness, and color are all changeable — see [Configuration](#configuration)).
 
 - **Solid red bar** — at least one session is busy (Claude working).
 - **Pulsing red bar** — a session **needs a response from you** now (a permission
@@ -118,8 +119,8 @@ the bar live — no rebuild, no restart:
 
 | Menu item     | Default  | Meaning                                              |
 |---------------|----------|------------------------------------------------------|
-| **Position**  | Bottom   | Pin the bar to the Top or Bottom edge.               |
-| **Thickness** | `10` px  | Bar thickness (presets `4`–`30`). Bump for a big room. |
+| **Position**  | Top      | Pin the bar to the Top or Bottom edge.               |
+| **Thickness** | `6` px   | Bar thickness (presets `4`–`30`). Bump for a big room. |
 | **Bar Color…** | red      | Opens the macOS color picker; recolors the bar live. |
 | **About ccbar** | —      | Description, author, link to this repo.              |
 | **Quit ccbar** | —       | Stops the app (unloads the LaunchAgent so it stays down). |
@@ -154,8 +155,9 @@ compile-time constants at the top of `ccbar.swift` (rebuild + restart after chan
   message defaults to *pulse*, never to silently hiding a real prompt.)
 - `Stop` is the main-agent stop only (`SubagentStop` is a separate, unhooked event),
   so the bar tracks real turn boundaries, not sub-agent churn.
-- The bar sits at the very bottom edge. If your Dock is at the bottom and hides it,
-  switch **Position → Top** or bump **Thickness** in the menu-bar menu.
+- The bar defaults to the top edge. Switch **Position → Bottom** (or the reverse) and
+  bump **Thickness** in the menu-bar menu to taste — e.g. move it off an edge where a
+  bottom Dock or the notch would hide it.
 
 ## License
 

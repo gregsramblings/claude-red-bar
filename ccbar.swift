@@ -8,8 +8,8 @@ let staleAfter: TimeInterval = 12 * 3600  // ignore state files older than this
 
 // Runtime config lives in UserDefaults, driven by the menu-bar item. These are
 // the fallback defaults; the menu writes overrides that persist across launches.
-let defaultAtTop = false             // true = top edge, false = bottom edge
-let defaultBarHeight: Double = 10    // px thickness of the edge bar
+let defaultAtTop = true              // true = top edge, false = bottom edge
+let defaultBarHeight: Double = 6     // px thickness of the edge bar
 let defaultBarColor = NSColor(red: 1.00, green: 0.23, blue: 0.19, alpha: 1) // red
 let thicknessPresets: [Double] = [4, 6, 8, 10, 14, 20, 30]
 

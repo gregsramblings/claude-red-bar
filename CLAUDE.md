@@ -86,12 +86,15 @@ boundaries.
 
 - Runtime config lives in `UserDefaults`, driven by a menu-bar item (`NSStatusItem`,
   a small bar icon): **Position** (Top/Bottom, default Bottom), **Thickness** (px
-  presets, default 10), and **Bar Color…** (an `NSColorPanel`; the chosen `NSColor`
-  is archived into `UserDefaults`). `cfgAtTop()`/`cfgBarHeight()`/`cfgBarColor()` read
-  them; menu actions write the key and call `rebuild()` to re-lay every bar live (the
-  color panel applies on every drag via `colorChanged`). Fallback defaults and the
-  preset list (`defaultAtTop`, `defaultBarHeight`, `defaultBarColor`,
-  `thicknessPresets`) sit at the top of `ccbar.swift`, alongside the still-compile-time
+  presets, default 10), **Bar Color…** (an `NSColorPanel`; the chosen `NSColor`
+  is archived into `UserDefaults`), and **Done Sound** (system-sound name or "" for
+  None; `tick()` plays it via `NSSound` on the visible→off transition, i.e. when the
+  last live session finishes). `cfgAtTop()`/`cfgBarHeight()`/`cfgBarColor()`/
+  `cfgDoneSound()` read them; menu actions write the key and call `rebuild()` to
+  re-lay every bar live (the color panel applies on every drag via `colorChanged`).
+  Fallback defaults and the preset lists (`defaultAtTop`, `defaultBarHeight`,
+  `defaultBarColor`, `thicknessPresets`, `defaultDoneSound`, `doneSoundNames`) sit at
+  the top of `ccbar.swift`, alongside the still-compile-time
   `pollInterval`, `staleAfter`. Menu **Quit** unloads the LaunchAgent first
   (KeepAlive=true would else relaunch it).
 - No dependencies, no build step beyond `swiftc`. Keep it one file.

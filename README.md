@@ -122,6 +122,7 @@ the bar live — no rebuild, no restart:
 | **Position**  | Top      | Pin the bar to the Top or Bottom edge.               |
 | **Thickness** | `6` px   | Bar thickness (presets `4`–`30`). Bump for a big room. |
 | **Bar Color…** | red      | Opens the macOS color picker; recolors the bar live. |
+| **Done Sound** | Glass    | Chime when the bar clears (all sessions finished). Pick a system sound or **None**. |
 | **About ccbar** | —      | Description, author, link to this repo.              |
 | **Quit ccbar** | —       | Stops the app (unloads the LaunchAgent so it stays down). |
 

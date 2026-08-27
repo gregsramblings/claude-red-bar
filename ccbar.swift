@@ -12,6 +12,8 @@ let defaultAtTop = true              // true = top edge, false = bottom edge
 let defaultBarHeight: Double = 6     // px thickness of the edge bar
 let defaultBarColor = NSColor(red: 1.00, green: 0.23, blue: 0.19, alpha: 1) // red
 let thicknessPresets: [Double] = [4, 6, 8, 10, 14, 20, 30]
+let defaultDoneSound = "Glass"       // "" = no sound
+let doneSoundNames = ["Glass", "Ping", "Pop", "Purr", "Tink", "Blow", "Hero", "Submarine"]
 
 let ud = UserDefaults.standard
 func cfgAtTop() -> Bool { ud.bool(forKey: "atTop") }
@@ -23,6 +25,7 @@ func cfgBarColor() -> NSColor {
     }
     return defaultBarColor
 }
+func cfgDoneSound() -> String { ud.string(forKey: "doneSound") ?? defaultDoneSound }
 
 // solid = a session is busy (Claude working);
 // pulse = a session needs a response from you now (permission prompt / blocked
@@ -105,7 +108,8 @@ final class App: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ n: Notification) {
         NSApp.setActivationPolicy(.accessory)   // no dock icon
-        ud.register(defaults: ["atTop": defaultAtTop, "barHeight": defaultBarHeight])
+        ud.register(defaults: ["atTop": defaultAtTop, "barHeight": defaultBarHeight,
+                               "doneSound": defaultDoneSound])
         setupMenuBar()
         rebuild()
         NotificationCenter.default.addObserver(
@@ -177,6 +181,20 @@ final class App: NSObject, NSApplicationDelegate {
         color.target = self
         m.addItem(color)
 
+        let sound = NSMenuItem(title: "Done Sound", action: nil, keyEquivalent: "")
+        let soundSub = NSMenu()
+        let curSound = cfgDoneSound()
+        for name in ["None"] + doneSoundNames {
+            let it = NSMenuItem(title: name, action: #selector(setDoneSound(_:)), keyEquivalent: "")
+            it.target = self
+            it.representedObject = (name == "None") ? "" : name
+            it.state = ((it.representedObject as? String) == curSound) ? .on : .off
+            soundSub.addItem(it)
+            if name == "None" { soundSub.addItem(.separator()) }
+        }
+        sound.submenu = soundSub
+        m.addItem(sound)
+
         m.addItem(.separator())
         let about = NSMenuItem(title: "About ccbar", action: #selector(about), keyEquivalent: "")
         about.target = self
@@ -243,6 +261,13 @@ final class App: NSObject, NSApplicationDelegate {
         rebuild()
     }
 
+    @objc func setDoneSound(_ sender: NSMenuItem) {
+        let name = sender.representedObject as? String ?? ""
+        ud.set(name, forKey: "doneSound")
+        rebuildMenu()
+        if !name.isEmpty { NSSound(named: name)?.play() }   // preview
+    }
+
     @objc func uninstall() {
         let a = NSAlert()
         a.icon = barIcon()
@@ -287,9 +312,17 @@ final class App: NSObject, NSApplicationDelegate {
         NSApp.terminate(nil)
     }
 
+    var lastMode: Mode = .off
+
     func tick() {
         let mode = currentMode()
         bars.forEach { $0.apply(mode) }
+        // Bar just went away = every session finished (or answered) — chime once.
+        if lastMode != .off && mode == .off {
+            let name = cfgDoneSound()
+            if !name.isEmpty { NSSound(named: name)?.play() }
+        }
+        lastMode = mode
     }
 }
 

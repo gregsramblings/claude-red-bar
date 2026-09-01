@@ -1,4 +1,4 @@
-# ccbar - MacOS
+# ccredbar - MacOS
 
 **Version 1.0** · **macOS only** (uses AppKit + `launchd`; there is no Windows or Linux build).
 
@@ -26,8 +26,8 @@ and every monitor.
 > (no bar) — only actual prompts pulse. Structured `AskUserQuestion` prompts *do*
 > pulse, via a `PreToolUse`/`PostToolUse` hook on that tool.
 
-<img src="images/statusbar.jpg" width="320" alt="ccbar in action — the red bar along the bottom edge of the screen shows Claude is busy">
-<img src="images/statusbar-menu.jpg" width="260" alt="ccbar menu-bar menu — Position, Thickness, Bar Color, About, and Quit">
+<img src="images/statusbar.jpg" width="320" alt="ccredbar in action — the red bar along the bottom edge of the screen shows Claude is busy">
+<img src="images/statusbar-menu.jpg" width="260" alt="ccredbar menu-bar menu — Position, Thickness, Bar Color, About, and Quit">
 
 *Left: solid red along the bottom edge = Claude is working; it pulses when Claude needs a response from you. Right: the menu-bar menu for live configuration.*
 
@@ -49,8 +49,8 @@ compiler and `plutil` (built into macOS).
 ## Install
 
 ```bash
-git clone https://github.com/gregsramblings/claude-status-bar.git
-cd claude-status-bar
+git clone https://github.com/gregsramblings/claude-red-bar.git
+cd claude-red-bar
 ./install.sh
 ```
 
@@ -62,10 +62,10 @@ looks like this, with real paths filled in:
 
 ```json
 "hooks": {
-  "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "bash /path/to/claude-status-bar/hook.sh busy" }] }],
-  "Stop":            [{ "hooks": [{ "type": "command", "command": "bash /path/to/claude-status-bar/hook.sh waiting" }] }],
-  "Notification":    [{ "hooks": [{ "type": "command", "command": "bash /path/to/claude-status-bar/hook.sh needs_input" }] }],
-  "SessionEnd":      [{ "hooks": [{ "type": "command", "command": "bash /path/to/claude-status-bar/hook.sh end" }] }]
+  "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "bash /path/to/claude-red-bar/hook.sh busy" }] }],
+  "Stop":            [{ "hooks": [{ "type": "command", "command": "bash /path/to/claude-red-bar/hook.sh waiting" }] }],
+  "Notification":    [{ "hooks": [{ "type": "command", "command": "bash /path/to/claude-red-bar/hook.sh needs_input" }] }],
+  "SessionEnd":      [{ "hooks": [{ "type": "command", "command": "bash /path/to/claude-red-bar/hook.sh end" }] }]
 }
 ```
 
@@ -87,13 +87,13 @@ echo '{"session_id":"test"}' | ./hook.sh end     # bar should disappear
 ```
 
 Stops and removes the LaunchAgent and the state directory. It intentionally does not
-edit `settings.json` — remove the four ccbar `hooks` entries yourself, then delete
+edit `settings.json` — remove the four ccredbar `hooks` entries yourself, then delete
 the repo folder.
 
 ## How it works
 
 1. Claude Code **hooks** fire on state change and run `hook.sh`, which writes one
-   small JSON file per session into `~/.claude/ccbar/state/<session_id>.json`:
+   small JSON file per session into `~/.claude/ccredbar/state/<session_id>.json`:
    - `UserPromptSubmit` → `busy` (you handed off; Claude is working)
    - `Stop` → `waiting` (turn finished)
    - `Notification` → `notify`, which `hook.sh` splits into `needs_input` (a real
@@ -102,7 +102,7 @@ the repo folder.
      multiple-choice question waits on you); `PostToolUse` → `busy` (solid again
      once you answer)
    - `SessionEnd` → deletes the file
-2. `ccbar` (a tiny AppKit app, one borderless click-through window per screen at
+2. `ccredbar` (a tiny AppKit app, one borderless click-through window per screen at
    `.screenSaver` level, on all Spaces) polls the state directory every 0.4s: **solid**
    if any live session is `busy`, else **pulsing** if any is `needs_input`, else
    hidden (`waiting` — a finished turn — shows nothing).
@@ -114,7 +114,7 @@ needs your input. Stale files (older than 12h, e.g. from a crash that skipped
 
 ## Configuration
 
-ccbar adds a small bar-shaped icon to the **macOS menu bar**. Click it to configure
+ccredbar adds a small bar-shaped icon to the **macOS menu bar**. Click it to configure
 the bar live — no rebuild, no restart:
 
 | Menu item     | Default  | Meaning                                              |
@@ -123,11 +123,11 @@ the bar live — no rebuild, no restart:
 | **Thickness** | `6` px   | Bar thickness (presets `4`–`30`). Bump for a big room. |
 | **Bar Color…** | red      | Opens the macOS color picker; recolors the bar live. |
 | **Done Sound** | Glass    | Chime when the bar clears (all sessions finished). Pick a system sound or **None**. |
-| **About ccbar** | —      | Description, author, link to this repo.              |
-| **Quit ccbar** | —       | Stops the app (unloads the LaunchAgent so it stays down). |
+| **About ccredbar** | —      | Description, author, link to this repo.              |
+| **Quit ccredbar** | —       | Stops the app (unloads the LaunchAgent so it stays down). |
 
 Choices persist in `UserDefaults` across restarts. The remaining tunables are still
-compile-time constants at the top of `ccbar.swift` (rebuild + restart after changing —
+compile-time constants at the top of `ccredbar.swift` (rebuild + restart after changing —
 `./install.sh` again does both):
 
 | Constant       | Default | Meaning                                            |
@@ -139,11 +139,11 @@ compile-time constants at the top of `ccbar.swift` (rebuild + restart after chan
 
 | File               | Purpose                                                        |
 |--------------------|----------------------------------------------------------------|
-| `ccbar.swift`      | The whole app (AppKit, single file).                           |
+| `ccredbar.swift`      | The whole app (AppKit, single file).                           |
 | `hook.sh`          | Claude Code hook target; writes one state file per session.    |
 | `install.sh`       | Build + install LaunchAgent + print the hooks block.           |
 | `uninstall.sh`     | Stop + remove the LaunchAgent and state dir.                   |
-| `ccbar`            | Compiled binary (gitignored — built by `install.sh`).          |
+| `ccredbar`            | Compiled binary (gitignored — built by `install.sh`).          |
 
 ## Notes
 

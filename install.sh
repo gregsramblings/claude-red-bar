@@ -1,15 +1,15 @@
 #!/bin/bash
-# ccbar installer. Builds the app, installs a run-at-login LaunchAgent, and
+# ccredbar installer. Builds the app, installs a run-at-login LaunchAgent, and
 # prints the Claude Code hooks block to add to your settings. Paths are derived
 # from wherever this repo lives — nothing is hardcoded.
 set -euo pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-STATE_DIR="$HOME/.claude/ccbar/state"
-PLIST="$HOME/Library/LaunchAgents/com.ccbar.plist"
+STATE_DIR="$HOME/.claude/ccredbar/state"
+PLIST="$HOME/Library/LaunchAgents/com.ccredbar.plist"
 SETTINGS="$HOME/.claude/settings.json"
 
-echo "==> ccbar install (from $DIR)"
+echo "==> ccredbar install (from $DIR)"
 
 # 1. dependencies
 if [[ "$(uname)" != "Darwin" ]]; then
@@ -23,13 +23,23 @@ fi
 
 # 2. build
 echo "==> building"
-swiftc "$DIR/ccbar.swift" -o "$DIR/ccbar" -framework Cocoa
+swiftc "$DIR/ccredbar.swift" -o "$DIR/ccredbar" -framework Cocoa
 chmod +x "$DIR/hook.sh"
 
-# 3. state dir
+# 3. migrate from the old "ccbar" name (pre-rename installs): stop and remove
+# the old LaunchAgent and state dir so two copies don't run side by side.
+OLD_PLIST="$HOME/Library/LaunchAgents/com.ccbar.plist"
+if [[ -f "$OLD_PLIST" ]]; then
+  echo "==> removing old ccbar LaunchAgent"
+  launchctl unload "$OLD_PLIST" 2>/dev/null || true
+  rm -f "$OLD_PLIST"
+fi
+rm -rf "$HOME/.claude/ccbar"
+
+# 4. state dir
 mkdir -p "$STATE_DIR"
 
-# 4. LaunchAgent (generated with this repo's path)
+# 5. LaunchAgent (generated with this repo's path)
 echo "==> installing LaunchAgent -> $PLIST"
 mkdir -p "$HOME/Library/LaunchAgents"
 cat > "$PLIST" <<EOF
@@ -38,10 +48,10 @@ cat > "$PLIST" <<EOF
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.ccbar</string>
+    <string>com.ccredbar</string>
     <key>ProgramArguments</key>
     <array>
-        <string>$DIR/ccbar</string>
+        <string>$DIR/ccredbar</string>
     </array>
     <key>RunAtLoad</key>
     <true/>
@@ -52,9 +62,9 @@ cat > "$PLIST" <<EOF
 EOF
 launchctl unload "$PLIST" 2>/dev/null || true
 launchctl load "$PLIST"
-echo "==> ccbar is running (and will start at login)."
+echo "==> ccredbar is running (and will start at login)."
 
-# 5. hooks
+# 6. hooks
 echo
 echo "================================================================"
 echo "LAST STEP — wire up Claude Code hooks."

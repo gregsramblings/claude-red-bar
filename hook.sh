@@ -1,10 +1,10 @@
 #!/bin/bash
-# ccbar hook: write per-session state for the edge-bar app.
+# ccredbar hook: write per-session state for the edge-bar app.
 # Called by Claude Code hooks with one arg: busy | waiting | notify | end
 # Reads the hook JSON payload on stdin; needs session_id (+ cwd, and the
 # Notification message to tell a real prompt from the idle timeout).
 state="$1"
-dir="$HOME/.claude/ccbar/state"
+dir="$HOME/.claude/ccredbar/state"
 mkdir -p "$dir"
 
 input=$(cat)

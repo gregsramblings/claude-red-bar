@@ -1,8 +1,8 @@
 import Cocoa
 
 // ---- config ----
-let ccbarVersion = "1.0"
-let stateDir = ("~/.claude/ccbar/state" as NSString).expandingTildeInPath
+let ccredbarVersion = "1.0"
+let stateDir = ("~/.claude/ccredbar/state" as NSString).expandingTildeInPath
 let pollInterval = 0.4               // seconds
 let staleAfter: TimeInterval = 12 * 3600  // ignore state files older than this
 
@@ -196,15 +196,15 @@ final class App: NSObject, NSApplicationDelegate {
         m.addItem(sound)
 
         m.addItem(.separator())
-        let about = NSMenuItem(title: "About ccbar", action: #selector(about), keyEquivalent: "")
+        let about = NSMenuItem(title: "About ccredbar", action: #selector(about), keyEquivalent: "")
         about.target = self
         m.addItem(about)
 
-        let uninstall = NSMenuItem(title: "Uninstall ccbar…", action: #selector(uninstall), keyEquivalent: "")
+        let uninstall = NSMenuItem(title: "Uninstall ccredbar…", action: #selector(uninstall), keyEquivalent: "")
         uninstall.target = self
         m.addItem(uninstall)
 
-        let quit = NSMenuItem(title: "Quit ccbar", action: #selector(quit), keyEquivalent: "q")
+        let quit = NSMenuItem(title: "Quit ccredbar", action: #selector(quit), keyEquivalent: "q")
         quit.target = self
         m.addItem(quit)
 
@@ -233,7 +233,7 @@ final class App: NSObject, NSApplicationDelegate {
     @objc func about() {
         let a = NSAlert()
         a.icon = barIcon()
-        a.messageText = "ccbar \(ccbarVersion)"
+        a.messageText = "ccredbar \(ccredbarVersion)"
         a.informativeText = """
             A full-width red edge bar that signals, from across the room, what \
             Claude Code is doing: solid = working, pulsing = needs your input.
@@ -244,7 +244,7 @@ final class App: NSObject, NSApplicationDelegate {
         a.addButton(withTitle: "Close")
         NSApp.activate(ignoringOtherApps: true)
         if a.runModal() == .alertFirstButtonReturn,
-           let url = URL(string: "https://github.com/gregsramblings/claude-status-bar") {
+           let url = URL(string: "https://github.com/gregsramblings/claude-red-bar") {
             NSWorkspace.shared.open(url)
         }
     }
@@ -272,12 +272,12 @@ final class App: NSObject, NSApplicationDelegate {
         let a = NSAlert()
         a.icon = barIcon()
         a.alertStyle = .warning
-        a.messageText = "Uninstall ccbar?"
+        a.messageText = "Uninstall ccredbar?"
         a.informativeText = """
             This stops and removes the LaunchAgent and deletes the state \
-            directory (~/.claude/ccbar), then quits.
+            directory (~/.claude/ccredbar), then quits.
 
-            You must still remove the ccbar "hooks" block from \
+            You must still remove the ccredbar "hooks" block from \
             ~/.claude/settings.json yourself, and delete the repo folder to \
             remove the binary.
             """
@@ -287,7 +287,7 @@ final class App: NSObject, NSApplicationDelegate {
         guard a.runModal() == .alertFirstButtonReturn else { return }
 
         // Unload before deleting the plist so launchd doesn't relaunch us.
-        let plist = ("~/Library/LaunchAgents/com.ccbar.plist" as NSString).expandingTildeInPath
+        let plist = ("~/Library/LaunchAgents/com.ccredbar.plist" as NSString).expandingTildeInPath
         let p = Process()
         p.launchPath = "/bin/launchctl"
         p.arguments = ["unload", plist]
@@ -296,14 +296,14 @@ final class App: NSObject, NSApplicationDelegate {
 
         let fm = FileManager.default
         try? fm.removeItem(atPath: plist)
-        try? fm.removeItem(atPath: ("~/.claude/ccbar" as NSString).expandingTildeInPath)
+        try? fm.removeItem(atPath: ("~/.claude/ccredbar" as NSString).expandingTildeInPath)
         NSApp.terminate(nil)
     }
 
     @objc func quit() {
         // KeepAlive=true in the LaunchAgent would relaunch us within seconds, so a
         // plain terminate wouldn't stick. Unload the agent first, then exit.
-        let plist = ("~/Library/LaunchAgents/com.ccbar.plist" as NSString).expandingTildeInPath
+        let plist = ("~/Library/LaunchAgents/com.ccredbar.plist" as NSString).expandingTildeInPath
         let p = Process()
         p.launchPath = "/bin/launchctl"
         p.arguments = ["unload", plist]

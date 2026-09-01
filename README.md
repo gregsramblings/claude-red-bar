@@ -10,6 +10,10 @@ across the room, what Claude Code is doing. It sits on the **top** edge by defau
 - **Pulsing red bar** — a session **needs a response from you** now (a permission
   prompt, or Claude blocked waiting for input).
 - **No bar** — a turn simply finished, or nothing running.
+- **Completion chime** — an optional sound (default: Glass) plays the moment the
+  bar clears, i.e. when the last busy session finishes — so you hear it even if
+  you aren't looking at the screen. Pick a different system sound, or turn it
+  off, in the menu (see [Configuration](#configuration)).
 
 Busy wins: if any session is still working the bar is solid; it pulses only when one
 has an active prompt for you (a permission request or an explicit question). A turn
@@ -105,7 +109,8 @@ the repo folder.
 2. `ccredbar` (a tiny AppKit app, one borderless click-through window per screen at
    `.screenSaver` level, on all Spaces) polls the state directory every 0.4s: **solid**
    if any live session is `busy`, else **pulsing** if any is `needs_input`, else
-   hidden (`waiting` — a finished turn — shows nothing).
+   hidden (`waiting` — a finished turn — shows nothing). When the bar transitions
+   from visible to hidden, the completion chime plays once.
 
 Multi-session just works: each session is its own file keyed by `session_id`, so
 three concurrent sessions share one bar — solid if *any* is working, pulsing if *any*
